@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sq">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact — Pearls Collective</title>
+  <title>Kontakt — Pearls Collective</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -13,54 +13,54 @@
 <body data-page="contact">
 
   <div class="page-hero">
-    <span class="eyebrow">We'd love to hear from you</span>
-    <h1>Get in Touch</h1>
+    <span class="eyebrow" data-i18n="contact.eyebrow">Do të donim t'ju dëgjonim</span>
+    <h1 data-i18n="contact.title">Na kontaktoni</h1>
   </div>
 
   <section style="padding-top:clamp(10px,2vw,30px)">
     <div class="container">
       <div class="contact-grid">
         <div class="contact-info reveal">
-          <h2>Contact</h2>
-          <p>Questions about a piece, your order, or styling for your day — we answer every message personally.</p>
+          <h2 data-i18n="contact.infoTitle">Kontakt</h2>
+          <p data-i18n="contact.infoBody">Pyetje për një copë, porosinë ose stilimin e ditës suaj.</p>
           <ul class="contact-list">
-            <li><span class="cl-label">Email</span><a href="mailto:hello@pearlscollective.com">hello@pearlscollective.com</a></li>
-            <li><span class="cl-label">Instagram</span><a href="https://www.instagram.com/pearlscollective/" target="_blank" rel="noopener">@pearlscollective</a></li>
-            <li><span class="cl-label">Shipping</span><span>Kosovo · Albania · Macedonia</span></li>
-            <li><span class="cl-label">Hours</span><span>Mon – Sat, 9:00 – 19:00</span></li>
+            <li><span class="cl-label" data-i18n="contact.email">Email</span><a href="mailto:hello@pearlscollective.com">hello@pearlscollective.com</a></li>
+            <li><span class="cl-label" data-i18n="contact.instagram">Instagram</span><a href="https://www.instagram.com/pearlscollective/" target="_blank" rel="noopener">@pearlscollective</a></li>
+            <li><span class="cl-label" data-i18n="contact.shipping">Dërgesa</span><span data-i18n="contact.shippingVal">Kosovë · Shqipëri · Maqedoni</span></li>
+            <li><span class="cl-label" data-i18n="contact.hours">Orari</span><span data-i18n="contact.hoursVal">Hën – Sht, 9:00 – 19:00</span></li>
           </ul>
           <div class="bridal-enquiry">
-            <h3>Bridal Enquiries</h3>
-            <p>“For styling questions, bridal appointments, custom requests or help choosing your perfect pieces, we'd love to hear from you.”</p>
+            <h3 data-i18n="contact.bridalTitle">Pyetje për nuse</h3>
+            <p data-i18n="contact.bridalBody">“Për pyetje stilimi, takime dhe kërkesa të veçanta.”</p>
           </div>
         </div>
 
         <div class="reveal">
           <form id="contactForm" class="form-grid" novalidate>
             <div class="field">
-              <label for="cName">Name</label>
-              <input id="cName" type="text" required placeholder="Your name">
+              <label for="cName" data-i18n="contact.form.name">Emri</label>
+              <input id="cName" type="text" required data-i18n-attr="placeholder:contact.form.namePh" placeholder="Emri juaj">
             </div>
             <div class="field">
-              <label for="cEmail">Email</label>
-              <input id="cEmail" type="email" required placeholder="you@email.com">
+              <label for="cEmail" data-i18n="contact.form.email">Email</label>
+              <input id="cEmail" type="email" required data-i18n-attr="placeholder:contact.form.emailPh" placeholder="ju@email.com">
             </div>
             <div class="field full">
-              <label for="cTopic">Topic</label>
+              <label for="cTopic" data-i18n="contact.form.topic">Tema</label>
               <select id="cTopic">
-                <option>General question</option>
-                <option>Bridal enquiry</option>
-                <option>My order</option>
-                <option>Custom request</option>
-                <option>Returns</option>
+                <option data-i18n="contact.form.t1">Pyetje e përgjithshme</option>
+                <option data-i18n="contact.form.t2">Pyetje për nuse</option>
+                <option data-i18n="contact.form.t3">Porosia ime</option>
+                <option data-i18n="contact.form.t4">Kërkesë e veçantë</option>
+                <option data-i18n="contact.form.t5">Kthime</option>
               </select>
             </div>
             <div class="field full">
-              <label for="cMsg">Message</label>
-              <textarea id="cMsg" required placeholder="Tell us about your day, your look, or anything we can help with…"></textarea>
+              <label for="cMsg" data-i18n="contact.form.message">Mesazhi</label>
+              <textarea id="cMsg" required data-i18n-attr="placeholder:contact.form.messagePh" placeholder="Na tregoni për ditën tuaj…"></textarea>
             </div>
             <div class="full">
-              <button class="btn" type="submit" style="width:100%">Send Message</button>
+              <button class="btn" type="submit" style="width:100%" data-i18n="contact.form.send">Dërgo mesazhin</button>
               <div class="form-msg" id="formMsg"></div>
             </div>
           </form>
@@ -69,6 +69,7 @@
     </div>
   </section>
 
+  <script src="assets/js/i18n.js"></script>
   <script src="assets/js/products.js"></script>
   <script>
     function pageInit() {
@@ -76,10 +77,10 @@
         e.preventDefault();
         const f = e.target;
         if (!f.querySelector("#cName").value || !f.querySelector("#cEmail").value || !f.querySelector("#cMsg").value) {
-          document.getElementById("formMsg").textContent = "Please fill in your name, email and message.";
+          document.getElementById("formMsg").textContent = t("contact.form.missing");
           return;
         }
-        document.getElementById("formMsg").textContent = "Thank you — we've received your message and will reply within one working day.";
+        document.getElementById("formMsg").textContent = t("contact.form.thanks");
         f.reset();
       });
     }

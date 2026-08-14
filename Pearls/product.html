@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sq">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,13 +22,14 @@
   <section class="related" style="padding-bottom:clamp(56px,9vw,110px)">
     <div class="container">
       <div class="section-head reveal">
-        <span class="eyebrow">Complete the look</span>
-        <h2 class="section-title">You May Also Like</h2>
+        <span class="eyebrow" data-i18n="product.relatedEyebrow">Plotësoni pamjen</span>
+        <h2 class="section-title" data-i18n="product.relatedTitle">Mund t'ju pëlqejnë edhe</h2>
       </div>
       <div class="products-grid" id="relatedGrid"></div>
     </div>
   </section>
 
+  <script src="assets/js/i18n.js"></script>
   <script src="assets/js/products.js"></script>
   <script>
     let product, qty = 1, chosenVariant = null;
@@ -37,56 +38,56 @@
       const id = new URLSearchParams(location.search).get("id");
       product = findProduct(id) || PRODUCTS[0];
       chosenVariant = product.variants ? product.variants[0].options[0] : null;
-      document.title = `${product.name} — Pearls Collective`;
+      document.title = `${pName(product)} — Pearls Collective`;
 
       document.getElementById("crumbs").innerHTML =
-        `<a href="index.html">Home</a> &nbsp;/&nbsp; <a href="shop.html?cat=${product.category}">${CATEGORY_LABELS[product.category]}</a> &nbsp;/&nbsp; ${product.name}`;
+        `<a href="index.html">${t("product.home")}</a> &nbsp;/&nbsp; <a href="shop.html?cat=${product.category}">${categoryLabel(product.category)}</a> &nbsp;/&nbsp; ${pName(product)}`;
 
       document.getElementById("pdp").innerHTML = `
         <div class="pdp-gallery">
-          <div class="pdp-main"><img id="mainImg" src="${product.imgs[0]}" alt="${product.name}" style="object-position:${product.pos}"></div>
+          <div class="pdp-main"><img id="mainImg" src="${product.imgs[0]}" alt="${pName(product)}" style="object-position:${product.pos}"></div>
           ${product.imgs.length > 1 ? `
           <div class="pdp-thumbs">
             ${product.imgs.map((src, i) => `
-              <button class="${i === 0 ? "active" : ""}" data-thumb="${i}"><img src="${src}" alt="View ${i + 1}"></button>`).join("")}
+              <button class="${i === 0 ? "active" : ""}" data-thumb="${i}"><img src="${src}" alt="${pName(product)} ${i + 1}"></button>`).join("")}
           </div>` : ""}
         </div>
         <div class="pdp-info">
-          <span class="eyebrow">${CATEGORY_LABELS[product.category]}${product.isNew ? " · New" : ""}</span>
-          <h1>${product.name}</h1>
+          <span class="eyebrow">${categoryLabel(product.category)}${product.isNew ? " · " + t("product.badgeNew") : ""}</span>
+          <h1>${pName(product)}</h1>
           <div class="pdp-price">${money(product.price)}</div>
-          <p class="pdp-desc">${product.desc}</p>
+          <p class="pdp-desc">${pDesc(product)}</p>
 
           ${product.variants ? product.variants.map(v => `
             <div class="pdp-variants">
-              <label>${v.label}</label>
+              <label>${I18N.pick(v.label)}</label>
               <div class="variant-opts">
-                ${v.options.map((o, i) => `<button class="${i === 0 ? "active" : ""}" data-variant="${o}">${o}</button>`).join("")}
+                ${v.options.map((o, i) => { const label = I18N.pick(o); return `<button class="${i === 0 ? "active" : ""}" data-variant="${label}">${label}</button>`; }).join("")}
               </div>
             </div>`).join("") : ""}
 
           <div class="pdp-buy">
             <div class="qty">
-              <button id="qDec" aria-label="Decrease quantity">−</button>
-              <input id="qVal" value="1" readonly aria-label="Quantity">
-              <button id="qInc" aria-label="Increase quantity">+</button>
+              <button id="qDec" aria-label="${t("cart.decrease")}">−</button>
+              <input id="qVal" value="1" readonly aria-label="${t("product.quantity")}">
+              <button id="qInc" aria-label="${t("cart.increase")}">+</button>
             </div>
-            <button class="btn" id="addBtn">Add to Bag</button>
+            <button class="btn" id="addBtn">${t("product.addToBag")}</button>
           </div>
-          <div class="pdp-stock">In stock — ships within 1–2 working days</div>
+          <div class="pdp-stock">${t("product.inStock")}</div>
 
           <div class="accordion">
             <details open>
-              <summary>Details &amp; Materials</summary>
-              <div class="acc-body"><ul>${product.details.map(d => `<li>${d}</li>`).join("")}</ul></div>
+              <summary>${t("product.detailsTitle")}</summary>
+              <div class="acc-body"><ul>${pDetails(product).map(d => `<li>${d}</li>`).join("")}</ul></div>
             </details>
             <details>
-              <summary>Delivery</summary>
-              <div class="acc-body">Free shipping on orders over €60 to Kosovo, Albania &amp; Macedonia. Standard delivery €3, arriving in 2–4 working days. Each order is wrapped by hand in our signature packaging.</div>
+              <summary>${t("product.deliveryTitle")}</summary>
+              <div class="acc-body">${t("product.deliveryBody")}</div>
             </details>
             <details>
-              <summary>Returns</summary>
-              <div class="acc-body">Changed your mind? Unworn pieces in original packaging may be returned within 14 days of delivery. Contact us and we will arrange everything for you.</div>
+              <summary>${t("product.returnsTitle")}</summary>
+              <div class="acc-body">${t("product.returnsBody")}</div>
             </details>
           </div>
         </div>`;
@@ -103,7 +104,7 @@
       document.getElementById("qDec").addEventListener("click", () => setQty(qty - 1));
       document.getElementById("addBtn").addEventListener("click", () => {
         Cart.add(product.id, qty, chosenVariant);
-        toast(`${product.name} added to bag`);
+        toast(`${pName(product)} ${t("cart.added")}`);
         openCart();
       });
 

@@ -41,6 +41,11 @@ const Wishlist = {
 function findProduct(id) { return PRODUCTS.find(p => p.id === id); }
 function money(n) { return "€" + n.toFixed(2).replace(/\.00$/, ""); }
 
+/* Product text in the active language. */
+function pName(p) { return I18N.pick(p.name); }
+function pDesc(p) { return I18N.pick(p.desc); }
+function pDetails(p) { return I18N.pick(p.details); }
+
 /* ── Icons ── */
 const ICONS = {
   search: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7.5"/><path d="M21 21l-4.7-4.7"/></svg>',
@@ -52,33 +57,46 @@ const ICONS = {
 };
 
 /* ── Header / chrome injection ── */
+/* [href, translation key, page slug for the active state] */
 const NAV_LINKS = [
-  ["shop.html?cat=new", "New In"],
-  ["shop.html?cat=bridal", "Bridal"],
-  ["shop.html?cat=earrings", "Earrings"],
-  ["shop.html?cat=necklaces", "Necklaces"],
-  ["shop.html?cat=bracelets", "Bracelets"],
-  ["shop.html?cat=hair", "Hair Jewellery"],
-  ["about.html", "About"],
-  ["contact.html", "Contact"]
+  ["shop.html?cat=new", "nav.new", "new"],
+  ["shop.html?cat=bridal", "nav.bridal", "bridal"],
+  ["shop.html?cat=earrings", "nav.earrings", "earrings"],
+  ["shop.html?cat=necklaces", "nav.necklaces", "necklaces"],
+  ["shop.html?cat=bracelets", "nav.bracelets", "bracelets"],
+  ["shop.html?cat=hair", "nav.hair", "hair"],
+  ["about.html", "nav.about", "about"],
+  ["contact.html", "nav.contact", "contact"]
 ];
+
+/* Two-button language switch. The active one is pressed, not just styled, so
+   it is announced correctly rather than looking like a pair of plain links. */
+function langSwitchHtml(extraClass = "") {
+  const cur = I18N.lang;
+  return `
+    <div class="lang-switch ${extraClass}" role="group" aria-label="${t("nav.language")}">
+      <button type="button" data-lang="sq" aria-pressed="${cur === "sq"}" title="${t("nav.langSq")}">SQ</button>
+      <button type="button" data-lang="en" aria-pressed="${cur === "en"}" title="${t("nav.langEn")}">EN</button>
+    </div>`;
+}
 
 function buildChrome() {
   const page = document.body.dataset.page || "";
-  const navHtml = NAV_LINKS.map(([href, label]) =>
-    `<a href="${href}" ${label.toLowerCase() === page ? 'class="active"' : ""}>${label}</a>`).join("");
+  const navHtml = NAV_LINKS.map(([href, key, slug]) =>
+    `<a href="${href}" ${slug === page ? 'class="active"' : ""}>${t(key)}</a>`).join("");
 
   document.body.insertAdjacentHTML("afterbegin", `
-    <div class="announce">Free shipping over €60 · Kosovo, Albania &amp; Macedonia</div>
+    <div class="announce">${t("announce")}</div>
     <header class="header" id="header">
       <div class="container header-inner">
-        <button class="icon-btn hamburger" id="hamburgerBtn" aria-label="Menu">${ICONS.menu}</button>
+        <button class="icon-btn hamburger" id="hamburgerBtn" aria-label="${t("nav.menu")}">${ICONS.menu}</button>
         <a class="brand" href="index.html">Pearls <span>Collective</span></a>
         <nav class="nav" aria-label="Main">${navHtml}</nav>
         <div class="header-actions">
-          <button class="icon-btn" id="searchBtn" aria-label="Search">${ICONS.search}</button>
-          <button class="icon-btn" id="accountBtn" aria-label="Account">${ICONS.user}</button>
-          <button class="icon-btn" id="bagBtn" aria-label="Shopping bag">
+          ${langSwitchHtml()}
+          <button class="icon-btn" id="searchBtn" aria-label="${t("nav.search")}">${ICONS.search}</button>
+          <button class="icon-btn" id="accountBtn" aria-label="${t("nav.account")}">${ICONS.user}</button>
+          <button class="icon-btn" id="bagBtn" aria-label="${t("nav.bag")}">
             ${ICONS.bag}<span class="bag-count hidden" id="bagCount">0</span>
           </button>
         </div>
@@ -88,21 +106,22 @@ function buildChrome() {
     <nav class="mobile-nav" id="mobileNav" aria-label="Mobile">
       <div class="mobile-nav-head">
         <span class="brand">Pearls <span style="color:var(--gold)">Collective</span></span>
-        <button class="icon-btn" id="mobileClose" aria-label="Close menu">${ICONS.close}</button>
+        <button class="icon-btn" id="mobileClose" aria-label="${t("nav.close")}">${ICONS.close}</button>
       </div>
-      ${NAV_LINKS.map(([href, label]) => `<a class="mnav-link" href="${href}">${label}</a>`).join("")}
+      ${NAV_LINKS.map(([href, key]) => `<a class="mnav-link" href="${href}">${t(key)}</a>`).join("")}
+      ${langSwitchHtml("lang-switch--mobile")}
       <div class="mnav-foot">
         <a class="mnav-small" href="https://www.instagram.com/pearlscollective/" target="_blank" rel="noopener">Instagram — @pearlscollective</a>
-        <a class="mnav-small" href="contact.html">Bridal enquiries</a>
+        <a class="mnav-small" href="contact.html">${t("contact.bridalTitle")}</a>
       </div>
     </nav>
 
     <div class="overlay" id="overlay"></div>
 
-    <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping bag">
+    <aside class="cart-drawer" id="cartDrawer" aria-label="${t("nav.bag")}">
       <div class="cart-head">
-        <h3>Your Bag</h3>
-        <button class="icon-btn" id="cartClose" aria-label="Close bag">${ICONS.close}</button>
+        <h3>${t("cart.title")}</h3>
+        <button class="icon-btn" id="cartClose" aria-label="${t("nav.close")}">${ICONS.close}</button>
       </div>
       <div class="cart-items" id="cartItems"></div>
       <div class="cart-foot" id="cartFoot"></div>
@@ -112,8 +131,8 @@ function buildChrome() {
       <div class="container">
         <div class="search-bar">
           ${ICONS.search}
-          <input type="text" id="searchInput" placeholder="Search jewellery…" autocomplete="off">
-          <button class="icon-btn" id="searchClose" aria-label="Close search">${ICONS.close}</button>
+          <input type="text" id="searchInput" placeholder="${t("search.placeholder")}" autocomplete="off">
+          <button class="icon-btn" id="searchClose" aria-label="${t("nav.close")}">${ICONS.close}</button>
         </div>
         <div id="searchResults"></div>
       </div>
@@ -128,37 +147,37 @@ function buildChrome() {
         <div class="footer-grid">
           <div>
             <div class="brand">Pearls <span>Collective</span></div>
-            <p style="max-width:280px">Timeless bridal jewellery for your forever moment — designed with love, worn for a lifetime.</p>
+            <p style="max-width:280px">${t("footer.tagline")}</p>
           </div>
           <div>
-            <h4>Shop</h4>
+            <h4>${t("footer.shop")}</h4>
             <ul>
-              <li><a href="shop.html">All Jewellery</a></li>
-              <li><a href="shop.html?cat=bridal">Bridal</a></li>
-              <li><a href="shop.html?cat=earrings">Earrings</a></li>
-              <li><a href="shop.html?cat=necklaces">Necklaces</a></li>
-              <li><a href="shop.html?cat=bracelets">Bracelets</a></li>
+              <li><a href="shop.html">${t("footer.allJewellery")}</a></li>
+              <li><a href="shop.html?cat=bridal">${t("nav.bridal")}</a></li>
+              <li><a href="shop.html?cat=earrings">${t("nav.earrings")}</a></li>
+              <li><a href="shop.html?cat=necklaces">${t("nav.necklaces")}</a></li>
+              <li><a href="shop.html?cat=bracelets">${t("nav.bracelets")}</a></li>
             </ul>
           </div>
           <div>
-            <h4>Help</h4>
+            <h4>${t("footer.help")}</h4>
             <ul>
-              <li><a href="about.html">About</a></li>
-              <li><a href="contact.html">Contact</a></li>
-              <li><a href="contact.html">FAQ</a></li>
-              <li><a href="contact.html">Delivery</a></li>
-              <li><a href="contact.html">Returns</a></li>
+              <li><a href="about.html">${t("nav.about")}</a></li>
+              <li><a href="contact.html">${t("nav.contact")}</a></li>
+              <li><a href="contact.html">${t("footer.faq")}</a></li>
+              <li><a href="contact.html">${t("footer.deliveryLink")}</a></li>
+              <li><a href="contact.html">${t("footer.returnsLink")}</a></li>
             </ul>
           </div>
           <div class="footer-news">
-            <h4>Join the Collective</h4>
-            <p>New pieces, bridal inspiration and exclusive collections.</p>
+            <h4>${t("footer.newsTitle")}</h4>
+            <p>${t("footer.newsBody")}</p>
             <form class="news-form" data-newsletter>
-              <input type="email" placeholder="Your email address" required>
-              <button type="submit">Subscribe</button>
+              <input type="email" placeholder="${t("home.newsPlaceholder")}" required>
+              <button type="submit">${t("home.newsBtn")}</button>
             </form>
             <div class="news-msg"></div>
-            <h4 style="margin-top:26px">Follow</h4>
+            <h4 style="margin-top:26px">${t("footer.follow")}</h4>
             <ul>
               <li><a href="https://www.instagram.com/pearlscollective/" target="_blank" rel="noopener">Instagram</a></li>
               <li><a href="https://www.tiktok.com/" target="_blank" rel="noopener">TikTok</a></li>
@@ -166,8 +185,8 @@ function buildChrome() {
           </div>
         </div>
         <div class="footer-bottom">
-          <span>© 2026 Pearls Collective. All rights reserved.</span>
-          <span><a href="#">Privacy Policy</a> &nbsp;·&nbsp; <a href="#">Terms &amp; Conditions</a></span>
+          <span>${t("footer.rights")}</span>
+          <span><a href="contact.html">${t("footer.privacy")}</a> &nbsp;·&nbsp; <a href="contact.html">${t("footer.terms")}</a></span>
         </div>
       </div>
     </footer>
@@ -176,6 +195,18 @@ function buildChrome() {
   wireChrome();
   renderCart();
   updateBagCount();
+  I18N.apply();          // translate any static data-i18n markup on the page
+  applyMetaForPage();
+}
+
+/* Title and description follow the language too, not just the body copy. */
+function applyMetaForPage() {
+  const page = document.body.dataset.page || "";
+  const meta = I18N.dict().meta[page];
+  if (!meta) return;
+  if (meta.title) document.title = meta.title;
+  const d = document.querySelector('meta[name="description"]');
+  if (d && meta.desc) d.setAttribute("content", meta.desc);
 }
 
 /* ── Chrome behaviour ── */
@@ -209,7 +240,10 @@ function wireChrome() {
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeAll(); });
 
   document.getElementById("accountBtn").addEventListener("click", () =>
-    toast("Accounts are coming soon"));
+    toast(t("cart.accountSoon")));
+
+  document.querySelectorAll("[data-lang]").forEach(b =>
+    b.addEventListener("click", () => I18N.set(b.dataset.lang)));
 
   document.getElementById("searchInput").addEventListener("input", e => renderSearch(e.target.value));
 
@@ -217,7 +251,7 @@ function wireChrome() {
     f.addEventListener("submit", e => {
       e.preventDefault();
       const msg = f.parentElement.querySelector(".news-msg");
-      if (msg) msg.textContent = "Welcome to the Collective — you're on the list.";
+      if (msg) msg.textContent = t("home.newsThanks");
       f.reset();
     });
   });
@@ -243,36 +277,37 @@ function renderCart() {
   const items = Cart.read();
 
   if (!items.length) {
-    wrap.innerHTML = `<div class="cart-empty">Your bag is empty —<br>your forever pieces await.</div>`;
-    foot.innerHTML = `<a class="btn btn--ghost" style="width:100%" href="shop.html">Shop the collection</a>`;
+    wrap.innerHTML = `<div class="cart-empty">${t("cart.empty")}</div>`;
+    foot.innerHTML = `<a class="btn btn--ghost" style="width:100%" href="shop.html">${t("cart.shopBtn")}</a>`;
     return;
   }
 
   wrap.innerHTML = items.map(i => {
     const p = findProduct(i.id);
     if (!p) return "";
+    const name = pName(p);
     return `
       <div class="cart-item">
-        <a href="product.html?id=${p.id}"><img src="${p.imgs[0]}" alt="${p.name}" style="object-position:${p.pos}"></a>
+        <a href="product.html?id=${p.id}"><img src="${p.imgs[0]}" alt="${name}" style="object-position:${p.pos}"></a>
         <div>
-          <div class="ci-name">${p.name}</div>
+          <div class="ci-name">${name}</div>
           ${i.variant ? `<div class="ci-variant">${i.variant}</div>` : ""}
           <div class="ci-price">${money(p.price)}</div>
           <div class="ci-qty">
-            <button data-dec="${i.key}" aria-label="Decrease">−</button>
+            <button data-dec="${i.key}" aria-label="${t("cart.decrease")}">−</button>
             <span>${i.qty}</span>
-            <button data-inc="${i.key}" aria-label="Increase">+</button>
+            <button data-inc="${i.key}" aria-label="${t("cart.increase")}">+</button>
           </div>
         </div>
-        <button class="ci-remove" data-remove="${i.key}" aria-label="Remove">×</button>
+        <button class="ci-remove" data-remove="${i.key}" aria-label="${t("cart.remove")}">×</button>
       </div>`;
   }).join("");
 
   const total = Cart.total();
   foot.innerHTML = `
-    <div class="cart-total"><span>Subtotal</span><span>${money(total)}</span></div>
-    <div class="cart-note">${total >= 60 ? "Your order ships free ✦" : "Free shipping on orders over €60"}</div>
-    <a class="btn" href="checkout.html">Checkout</a>`;
+    <div class="cart-total"><span>${t("cart.subtotal")}</span><span>${money(total)}</span></div>
+    <div class="cart-note">${total >= 60 ? t("cart.free") : t("cart.freeFrom")}</div>
+    <a class="btn" href="checkout.html">${t("cart.checkout")}</a>`;
 
   wrap.querySelectorAll("[data-inc]").forEach(b => b.addEventListener("click", () => {
     const it = Cart.read().find(i => i.key === b.dataset.inc);
@@ -294,33 +329,40 @@ function openCart() {
 function renderSearch(q) {
   const wrap = document.getElementById("searchResults");
   q = (q || "").trim().toLowerCase();
-  if (!q) { wrap.innerHTML = `<div class="search-hint">Try “necklace”, “bridal set” or “earrings”…</div>`; return; }
+  if (!q) { wrap.innerHTML = `<div class="search-hint">${t("search.hint")}</div>`; return; }
+  /* Search both languages, so "necklace" still finds it while browsing in
+     Albanian and "gjerdan" still finds it while browsing in English. */
+  const hay = p => [p.name, p.desc].flatMap(f => Object.values(f)).join(" ").toLowerCase();
   const hits = PRODUCTS.filter(p =>
-    p.name.toLowerCase().includes(q) ||
+    hay(p).includes(q) ||
     p.category.includes(q) ||
-    p.desc.toLowerCase().includes(q));
-  if (!hits.length) { wrap.innerHTML = `<div class="search-hint">Nothing found for “${q}” — try another word.</div>`; return; }
+    Object.values(CATEGORY_LABELS[p.category] || {}).join(" ").toLowerCase().includes(q));
+  if (!hits.length) {
+    wrap.innerHTML = `<div class="search-hint">${t("search.none")} “${q}” ${t("search.tryAnother")}</div>`;
+    return;
+  }
   wrap.innerHTML = `<div class="search-results">` + hits.map(p => `
     <a class="sr-card" href="product.html?id=${p.id}">
-      <img src="${p.imgs[0]}" alt="${p.name}" style="object-position:${p.pos}">
-      <div><div class="sr-name">${p.name}</div><div class="sr-price">${money(p.price)}</div></div>
+      <img src="${p.imgs[0]}" alt="${pName(p)}" style="object-position:${p.pos}">
+      <div><div class="sr-name">${pName(p)}</div><div class="sr-price">${money(p.price)}</div></div>
     </a>`).join("") + `</div>`;
 }
 
 /* ── Product cards ── */
 function productCard(p) {
   const wished = Wishlist.has(p.id);
+  const name = pName(p);
   return `
     <div class="product-card reveal">
-      ${p.isNew ? `<span class="pc-badge">New</span>` : ""}
-      <button class="pc-wish ${wished ? "active" : ""}" data-wish="${p.id}" aria-label="Add to wishlist">${ICONS.heart}</button>
+      ${p.isNew ? `<span class="pc-badge">${t("product.badgeNew")}</span>` : ""}
+      <button class="pc-wish ${wished ? "active" : ""}" data-wish="${p.id}" aria-label="${t("wish.add")}">${ICONS.heart}</button>
       <a class="pc-media" href="product.html?id=${p.id}">
-        <img src="${p.imgs[0]}" alt="${p.name}" loading="lazy" style="object-position:${p.pos}">
+        <img src="${p.imgs[0]}" alt="${name}" loading="lazy" style="object-position:${p.pos}">
       </a>
-      <button class="pc-add" data-add="${p.id}">Add to Bag</button>
+      <button class="pc-add" data-add="${p.id}">${t("product.addToBag")}</button>
       <div class="pc-info">
-        <a href="product.html?id=${p.id}"><div class="pc-name">${p.name}</div></a>
-        <div class="pc-price">${p.id === "riviera-stacking-bracelets" ? "From " : ""}${money(p.price)}</div>
+        <a href="product.html?id=${p.id}"><div class="pc-name">${name}</div></a>
+        <div class="pc-price">${p.id === "riviera-stacking-bracelets" ? t("product.from") : ""}${money(p.price)}</div>
       </div>
     </div>`;
 }
@@ -328,15 +370,15 @@ function productCard(p) {
 function wireProductCards(scope = document) {
   scope.querySelectorAll("[data-add]").forEach(b => b.addEventListener("click", () => {
     const p = findProduct(b.dataset.add);
-    const v = p.variants ? p.variants[0].options[0] : null;
+    const v = p.variants ? I18N.pick(p.variants[0].options[0]) : null;
     Cart.add(p.id, 1, v);
-    toast(`${p.name} added to bag`);
+    toast(`${pName(p)} ${t("cart.added")}`);
     openCart();
   }));
   scope.querySelectorAll("[data-wish]").forEach(b => b.addEventListener("click", () => {
     const on = Wishlist.toggle(b.dataset.wish);
     b.classList.toggle("active", on);
-    toast(on ? "Saved to wishlist" : "Removed from wishlist");
+    toast(on ? t("wish.saved") : t("wish.removed"));
   }));
 }
 

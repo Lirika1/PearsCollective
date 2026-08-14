@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sq">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,14 +13,15 @@
 <body data-page="checkout">
 
   <div class="page-hero">
-    <span class="eyebrow">Almost yours</span>
-    <h1>Checkout</h1>
+    <span class="eyebrow" data-i18n="checkout.eyebrow">Gati e juaja</span>
+    <h1 data-i18n="checkout.title">Pagesa</h1>
   </div>
 
   <section style="padding-top:clamp(10px,2vw,30px)">
     <div class="container" id="checkoutWrap"></div>
   </section>
 
+  <script src="assets/js/i18n.js"></script>
   <script src="assets/js/products.js"></script>
   <script>
     function pageInit() { renderCheckout(); }
@@ -32,9 +33,9 @@
       if (!items.length) {
         wrap.innerHTML = `
           <div class="checkout-done">
-            <h2>Your bag is empty</h2>
-            <p>“Your forever pieces are still waiting to be found.”</p>
-            <a class="btn" href="shop.html">Shop the Collection</a>
+            <h2>${t("checkout.emptyTitle")}</h2>
+            <p>${t("checkout.emptyBody")}</p>
+            <a class="btn" href="shop.html">${t("checkout.emptyCta")}</a>
           </div>`;
         return;
       }
@@ -46,61 +47,61 @@
         <div class="checkout-grid">
           <form id="checkoutForm" novalidate>
             <div class="checkout-section">
-              <h2>Contact</h2>
+              <h2>${t("checkout.contact")}</h2>
               <div class="form-grid">
-                <div class="field"><label for="fName">First name</label><input id="fName" required></div>
-                <div class="field"><label for="lName">Last name</label><input id="lName" required></div>
-                <div class="field full"><label for="email">Email</label><input id="email" type="email" required></div>
-                <div class="field full"><label for="phone">Phone</label><input id="phone" type="tel" placeholder="+383 …"></div>
+                <div class="field"><label for="fName">${t("checkout.firstName")}</label><input id="fName" required></div>
+                <div class="field"><label for="lName">${t("checkout.lastName")}</label><input id="lName" required></div>
+                <div class="field full"><label for="email">${t("checkout.email")}</label><input id="email" type="email" required></div>
+                <div class="field full"><label for="phone">${t("checkout.phone")}</label><input id="phone" type="tel" placeholder="+383 …"></div>
               </div>
 
-              <h2>Delivery</h2>
+              <h2>${t("checkout.delivery")}</h2>
               <div class="form-grid">
-                <div class="field full"><label for="addr">Address</label><input id="addr" required></div>
-                <div class="field"><label for="city">City</label><input id="city" required></div>
-                <div class="field"><label for="country">Country</label>
+                <div class="field full"><label for="addr">${t("checkout.address")}</label><input id="addr" required></div>
+                <div class="field"><label for="city">${t("checkout.city")}</label><input id="city" required></div>
+                <div class="field"><label for="country">${t("checkout.country")}</label>
                   <select id="country">
-                    <option>Kosovo</option>
-                    <option>Albania</option>
-                    <option>North Macedonia</option>
+                    <option>${t("checkout.kosovo")}</option>
+                    <option>${t("checkout.albania")}</option>
+                    <option>${t("checkout.macedonia")}</option>
                   </select>
                 </div>
               </div>
 
-              <h2>Payment</h2>
+              <h2>${t("checkout.payment")}</h2>
               <div class="form-grid">
-                <div class="field full"><label for="payMethod">Method</label>
+                <div class="field full"><label for="payMethod">${t("checkout.method")}</label>
                   <select id="payMethod">
-                    <option>Cash on delivery</option>
-                    <option>Bank transfer</option>
+                    <option>${t("checkout.cod")}</option>
+                    <option>${t("checkout.transfer")}</option>
                   </select>
                 </div>
               </div>
-              <p class="pay-note">This is a preview store — no payment is taken online. We confirm every order personally before it ships.</p>
+              <p class="pay-note">${t("checkout.payNote")}</p>
 
               <div style="margin-top:30px">
-                <button class="btn" type="submit" style="width:100%">Place Order — ${money(subtotal + shipping)}</button>
+                <button class="btn" type="submit" style="width:100%">${t("checkout.place")} ${money(subtotal + shipping)}</button>
                 <div class="form-msg" id="coMsg"></div>
               </div>
             </div>
           </form>
 
           <aside class="order-summary">
-            <h3>Order Summary</h3>
+            <h3>${t("checkout.summary")}</h3>
             ${items.map(i => {
               const p = findProduct(i.id);
               return `<div class="os-item">
-                <img src="${p.imgs[0]}" alt="${p.name}" style="object-position:${p.pos}">
+                <img src="${p.imgs[0]}" alt="${pName(p)}" style="object-position:${p.pos}">
                 <div>
-                  <div class="osi-n">${p.name}</div>
-                  <div class="osi-q">${i.variant ? i.variant + " · " : ""}Qty ${i.qty}</div>
+                  <div class="osi-n">${pName(p)}</div>
+                  <div class="osi-q">${i.variant ? i.variant + " · " : ""}${t("checkout.qty")} ${i.qty}</div>
                 </div>
                 <div class="osi-p">${money(p.price * i.qty)}</div>
               </div>`;
             }).join("")}
-            <div class="os-row" style="margin-top:14px"><span>Subtotal</span><span>${money(subtotal)}</span></div>
-            <div class="os-row"><span>Shipping</span><span>${shipping === 0 ? "Free" : money(shipping)}</span></div>
-            <div class="os-row total"><span>Total</span><span>${money(subtotal + shipping)}</span></div>
+            <div class="os-row" style="margin-top:14px"><span>${t("checkout.subtotal")}</span><span>${money(subtotal)}</span></div>
+            <div class="os-row"><span>${t("checkout.shipping")}</span><span>${shipping === 0 ? t("checkout.free") : money(shipping)}</span></div>
+            <div class="os-row total"><span>${t("checkout.total")}</span><span>${money(subtotal + shipping)}</span></div>
           </aside>
         </div>`;
 
@@ -109,16 +110,16 @@
         const required = ["fName", "lName", "email", "addr", "city"];
         const missing = required.some(id => !document.getElementById(id).value.trim());
         if (missing) {
-          document.getElementById("coMsg").textContent = "Please complete your contact and delivery details.";
+          document.getElementById("coMsg").textContent = t("checkout.missing");
           return;
         }
         Cart.clear();
         wrap.innerHTML = `
           <div class="checkout-done">
-            <span class="eyebrow">Order received</span>
-            <h2>Thank You</h2>
-            <p>“Your pieces are being wrapped with love. We'll be in touch to confirm delivery — see you at the aisle.”</p>
-            <a class="btn" href="index.html">Back to Home</a>
+            <span class="eyebrow">${t("checkout.doneEyebrow")}</span>
+            <h2>${t("checkout.doneTitle")}</h2>
+            <p>${t("checkout.doneBody")}</p>
+            <a class="btn" href="index.html">${t("checkout.doneCta")}</a>
           </div>`;
         window.scrollTo({ top: 0, behavior: "smooth" });
       });
