@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop — Pearls Collective</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='38' fill='%23E9E0D2' stroke='%23B39A6E' stroke-width='4'/></svg>">
+</head>
+<body data-page="shop">
+
+  <div class="page-hero">
+    <span class="eyebrow">The Collection</span>
+    <h1 id="shopTitle">All Jewellery</h1>
+    <p id="shopSub">Timeless pieces for brides, bridesmaids and beautiful occasions.</p>
+  </div>
+
+  <section style="padding-top:0">
+    <div class="container">
+      <div class="shop-toolbar">
+        <div class="filter-pills" id="filterPills"></div>
+        <div style="display:flex; align-items:center; gap:22px">
+          <span class="shop-count" id="shopCount"></span>
+          <select class="sort-select" id="sortSelect" aria-label="Sort products">
+            <option value="featured">Sort · Featured</option>
+            <option value="price-asc">Price · Low to High</option>
+            <option value="price-desc">Price · High to Low</option>
+            <option value="new">Newest First</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="hairNotice" style="display:none">
+        <div class="coming-soon">
+          <span class="eyebrow">Hair Jewellery</span>
+          <h2>The Perfect Detail, Arriving Soon</h2>
+          <p>“Our hair jewellery edit is being lovingly curated. For bridal hair styling and custom requests, we would love to hear from you.”</p>
+          <a class="btn btn--ghost" href="contact.html">Bridal Enquiries</a>
+        </div>
+      </div>
+
+      <div class="products-grid" id="shopGrid"></div>
+      <div class="shop-empty" id="shopEmpty" style="display:none">No pieces found in this edit yet.</div>
+    </div>
+  </section>
+
+  <script src="assets/js/products.js"></script>
+  <script>
+    const CATS = [
+      ["all", "All"],
+      ["new", "New In"],
+      ["bridal", "Bridal"],
+      ["earrings", "Earrings"],
+      ["necklaces", "Necklaces"],
+      ["bracelets", "Bracelets"],
+      ["hair", "Hair Jewellery"]
+    ];
+    const SUBS = {
+      all: "Timeless pieces for brides, bridesmaids and beautiful occasions.",
+      new: "The latest arrivals — fresh from the atelier.",
+      bridal: "Complete sets and precious details, designed for the bride.",
+      earrings: "Elegant pieces to frame your bridal look.",
+      necklaces: "Delicate and timeless finishing touches.",
+      bracelets: "Fine sparkle for your wrist — worn alone or stacked.",
+      hair: "The perfect detail for your wedding hairstyle."
+    };
+
+    let currentCat = new URLSearchParams(location.search).get("cat") || "all";
+    if (!CATS.some(c => c[0] === currentCat)) currentCat = "all";
+    let currentSort = "featured";
+
+    function pageInit() {
+      const pills = document.getElementById("filterPills");
+      pills.innerHTML = CATS.map(([key, label]) =>
+        `<button class="pill ${key === currentCat ? "active" : ""}" data-cat="${key}">${label}</button>`).join("");
+      pills.querySelectorAll("[data-cat]").forEach(b => b.addEventListener("click", () => {
+        currentCat = b.dataset.cat;
+        history.replaceState(null, "", currentCat === "all" ? "shop.html" : `shop.html?cat=${currentCat}`);
+        pills.querySelectorAll(".pill").forEach(p => p.classList.toggle("active", p.dataset.cat === currentCat));
+        render();
+      }));
+      document.getElementById("sortSelect").addEventListener("change", e => { currentSort = e.target.value; render(); });
+      render();
+    }
+
+    function render() {
+      const grid = document.getElementById("shopGrid");
+      const empty = document.getElementById("shopEmpty");
+      const hairNotice = document.getElementById("hairNotice");
+      const title = document.getElementById("shopTitle");
+      const sub = document.getElementById("shopSub");
+
+      title.textContent = currentCat === "all" ? "All Jewellery" : CATEGORY_LABELS[currentCat] || "Shop";
+      sub.textContent = SUBS[currentCat] || SUBS.all;
+      hairNotice.style.display = currentCat === "hair" ? "block" : "none";
+
+      let items = PRODUCTS.filter(p => {
+        if (currentCat === "all") return true;
+        if (currentCat === "new") return p.isNew;
+        return p.category === currentCat;
+      });
+
+      if (currentSort === "price-asc") items.sort((a, b) => a.price - b.price);
+      else if (currentSort === "price-desc") items.sort((a, b) => b.price - a.price);
+      else if (currentSort === "new") items.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+
+      document.getElementById("shopCount").textContent =
+        items.length ? `${items.length} piece${items.length === 1 ? "" : "s"}` : "";
+
+      grid.innerHTML = items.map(productCard).join("");
+      empty.style.display = (!items.length && currentCat !== "hair") ? "block" : "none";
+      wireProductCards(grid);
+      initReveals();
+    }
+  </script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — Pearls Collective</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='38' fill='%23E9E0D2' stroke='%23B39A6E' stroke-width='4'/></svg>">
+</head>
+<body data-page="contact">
+
+  <div class="page-hero">
+    <span class="eyebrow">We'd love to hear from you</span>
+    <h1>Get in Touch</h1>
+  </div>
+
+  <section style="padding-top:clamp(10px,2vw,30px)">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info reveal">
+          <h2>Contact</h2>
+          <p>Questions about a piece, your order, or styling for your day — we answer every message personally.</p>
+          <ul class="contact-list">
+            <li><span class="cl-label">Email</span><a href="mailto:hello@pearlscollective.com">hello@pearlscollective.com</a></li>
+            <li><span class="cl-label">Instagram</span><a href="https://www.instagram.com/pearlscollective/" target="_blank" rel="noopener">@pearlscollective</a></li>
+            <li><span class="cl-label">Shipping</span><span>Kosovo · Albania · Macedonia</span></li>
+            <li><span class="cl-label">Hours</span><span>Mon – Sat, 9:00 – 19:00</span></li>
+          </ul>
+          <div class="bridal-enquiry">
+            <h3>Bridal Enquiries</h3>
+            <p>“For styling questions, bridal appointments, custom requests or help choosing your perfect pieces, we'd love to hear from you.”</p>
+          </div>
+        </div>
+
+        <div class="reveal">
+          <form id="contactForm" class="form-grid" novalidate>
+            <div class="field">
+              <label for="cName">Name</label>
+              <input id="cName" type="text" required placeholder="Your name">
+            </div>
+            <div class="field">
+              <label for="cEmail">Email</label>
+              <input id="cEmail" type="email" required placeholder="you@email.com">
+            </div>
+            <div class="field full">
+              <label for="cTopic">Topic</label>
+              <select id="cTopic">
+                <option>General question</option>
+                <option>Bridal enquiry</option>
+                <option>My order</option>
+                <option>Custom request</option>
+                <option>Returns</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="cMsg">Message</label>
+              <textarea id="cMsg" required placeholder="Tell us about your day, your look, or anything we can help with…"></textarea>
+            </div>
+            <div class="full">
+              <button class="btn" type="submit" style="width:100%">Send Message</button>
+              <div class="form-msg" id="formMsg"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script src="assets/js/products.js"></script>
+  <script>
+    function pageInit() {
+      document.getElementById("contactForm").addEventListener("submit", e => {
+        e.preventDefault();
+        const f = e.target;
+        if (!f.querySelector("#cName").value || !f.querySelector("#cEmail").value || !f.querySelector("#cMsg").value) {
+          document.getElementById("formMsg").textContent = "Please fill in your name, email and message.";
+          return;
+        }
+        document.getElementById("formMsg").textContent = "Thank you — we've received your message and will reply within one working day.";
+        f.reset();
+      });
+    }
+  </script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
