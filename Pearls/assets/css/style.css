@@ -6,10 +6,16 @@
   --ivory: #FBF9F5;
   --sand: #F3EEE6;
   --champagne: #E9E0D2;
+
+  /* --gold is DECORATIVE ONLY — hairlines, borders, ornaments, focus rings.
+     At 2.57:1 on ivory it is not legible as text. Anything with words in it
+     uses --gold-dark, which is the same hue taken far enough down to pass
+     WCAG AA (5.6:1 on ivory, 5.1:1 on sand, 5.9:1 under white). */
   --gold: #B39A6E;
-  --gold-dark: #99815A;
+  --gold-dark: #77613C;
+
   --ink: #2B2822;
-  --muted: #857C6F;
+  --muted: #6B6255;   /* was #857C6F — 3.91:1, below AA for body copy */
   --line: #E5DFD4;
   --white: #FFFFFF;
   --serif: "Cormorant Garamond", "Times New Roman", serif;
@@ -53,9 +59,12 @@ h1, h2, h3, .serif {
   font-size: 11px;
   letter-spacing: 0.32em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--gold-dark);
   font-weight: 400;
 }
+/* On the dark editorial and newsletter bands the light gold is the legible
+   one — the relationship inverts, so the override does too. */
+.editorial .eyebrow, .newsletter .eyebrow, .footer .eyebrow { color: var(--gold); }
 
 .section-title {
   font-size: clamp(28px, 4vw, 44px);
@@ -153,7 +162,22 @@ section { padding: clamp(56px, 9vw, 110px) 0; }
   white-space: nowrap;
   text-align: center;
 }
-.brand span { color: var(--gold); }
+.brand span { color: var(--gold-dark); }
+.footer .brand span, .mobile-nav .brand span { color: var(--gold); }
+
+/* ── Language switch ── */
+.lang-switch { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; flex: none; }
+.lang-switch button {
+  border: 0; background: none; padding: 7px 10px; min-height: 34px;
+  font-family: var(--sans); font-size: 11px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--muted);
+  transition: background .25s, color .25s;
+}
+.lang-switch button + button { border-left: 1px solid var(--line); }
+.lang-switch button:hover { color: var(--ink); background: var(--sand); }
+.lang-switch button[aria-pressed="true"] { background: var(--ink); color: var(--white); }
+.lang-switch--mobile { margin: 22px 0 4px; }
+@media (max-width: 900px) { .header-actions .lang-switch { display: none; } }
 
 .nav { display: flex; gap: clamp(14px, 1.6vw, 26px); justify-content: center; }
 .nav a {
@@ -881,7 +905,7 @@ section { padding: clamp(56px, 9vw, 110px) 0; }
 }
 .values-grid h3 { font-size: 19px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 12px; }
 .values-grid p { color: var(--muted); font-size: 14.5px; }
-.values-grid .v-num { font-family: var(--serif); font-style: italic; color: var(--gold); font-size: 30px; display: block; margin-bottom: 14px; }
+.values-grid .v-num { font-family: var(--serif); font-style: italic; color: var(--gold-dark); font-size: 30px; display: block; margin-bottom: 14px; }
 
 /* ── Contact page ── */
 .contact-grid {
